@@ -1,0 +1,32 @@
+# SnapSort Configuration
+
+# Folder to monitor for new screenshots (~ expands to home directory)
+watch_folder: "C:\\Users\\Gaming\\OneDrive\\Pictures\\Screenshots"
+
+# Where to place renamed files. Leave empty to rename in-place within watch_folder.
+output_folder: ""
+
+# Create a backup of the original file before renaming
+backup: true
+
+# Backup subfolder name (relative to watch_folder, or absolute path)
+backup_folder: ".backup"
+
+# Thumbnail dimensions [width, height] in pixels
+thumb_size: [200, 150]
+
+# Name of the generated HTML index file
+index_filename: "index.html"
+
+# Image file extensions to process
+image_extensions:
+  - ".png"
+  - ".jpg"
+  - ".jpeg"
+  - ".gif"
+  - ".bmp"
+  - ".webp"
+  - ".tiff"
+
+# Organise files into YYYY/MM-DD subfolders within output_folder
+date_subfolders: false

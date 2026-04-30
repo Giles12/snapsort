@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SnapSort — Screenshot Index</title>
+  <style>
+    :root {
+      --bg:       #0f1117;
+      --surface:  #1a1d2e;
+      --card:     #1e2235;
+      --accent:   #6c63ff;
+      --accent2:  #4ecca3;
+      --text:     #e2e8f0;
+      --muted:    #8892a4;
+      --border:   #2d3148;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────────── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 1.75rem;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.65rem;
+    }
+    h1 {
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+      color: var(--accent);
+    }
+    h1 span { color: var(--accent2); }
+    #count-label { color: var(--muted); font-size: 0.82rem; margin-left: auto; }
+
+    /* ── Filter bar ──────────────────────────────────────────────────────── */
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .filters input,
+    .filters select {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.35rem 0.7rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .filters input:focus, .filters select:focus { border-color: var(--accent); }
+    #search { flex: 1 1 160px; max-width: 280px; }
+
+    .btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn.active  { border-color: var(--accent); color: var(--accent); }
+    .view-toggle { display: flex; gap: 0.3rem; margin-left: auto; }
+    .view-btn { font-size: 1rem; padding: 0.3rem 0.55rem; }
+
+    /* ── Main content ────────────────────────────────────────────────────── */
+    main { padding: 1.25rem 1.75rem 2rem; }
+
+    /* Grid view */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 24px rgba(108, 99, 255, 0.22);
+    }
+    .card a { display: block; line-height: 0; }
+    .card img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      background: var(--bg);
+    }
+    .card .info { padding: 0.55rem 0.75rem; }
+    .card .name {
+      display: block;
+      font-size: 0.76rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 0.3rem;
+    }
+    .card .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    /* Table view */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td {
+      text-align: left;
+      padding: 0.55rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    th { color: var(--muted); font-weight: 500; background: var(--surface); }
+    tr:hover td { background: rgba(255,255,255,0.025); }
+    table img { width: 72px; height: 44px; object-fit: cover; border-radius: 5px; }
+    table a { color: var(--accent); text-decoration: none; }
+    table a:hover { text-decoration: underline; }
+
+    /* App badge */
+    .badge {
+      display: inline-block;
+      background: rgba(108,99,255,0.15);
+      color: var(--accent);
+      padding: 0.1rem 0.45rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      white-space: nowrap;
+    }
+
+    /* Utility */
+    .hidden       { display: none !important; }
+    .no-results   {
+      text-align: center;
+      padding: 3.5rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.25rem;
+      color: var(--muted);
+      font-size: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <h1>Snap<span>Sort</span></h1>
+    <span id="count-label">
+      {{ total }} screenshot{% if total != 1 %}s{% endif %}
+    </span>
+  </div>
+  <div class="filters">
+    <input type="search" id="search" placeholder="Search filenames…" autocomplete="off" />
+    <select id="app-filter">
+      <option value="">All Apps</option>
+      {% for app in apps %}
+      <option value="{{ app }}">{{ app }}</option>
+      {% endfor %}
+    </select>
+    <input type="date" id="date-from" title="From date" />
+    <input type="date" id="date-to"   title="To date"   />
+    <button class="btn" id="clear-btn">Clear</button>
+    <div class="view-toggle">
+      <button class="btn view-btn active" id="grid-btn" title="Grid view">⊞</button>
+      <button class="btn view-btn"        id="list-btn" title="Table view">☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- Grid view -->
+  <div class="gallery" id="grid-view">
+    {% for item in items %}
+    <div class="card"
+         data-name="{{ item.filename | lower }}"
+         data-app="{{ item.app }}"
+         data-date="{{ item.date_str }}">
+      <a href="{{ item.rel_path }}" target="_blank" rel="noopener">
+        <img src="{{ item.thumb_path }}" alt="{{ item.filename }}" loading="lazy" />
+      </a>
+      <div class="info">
+        <span class="name" title="{{ item.filename }}">{{ item.filename }}</span>
+        <div class="meta-row">
+          <span>{{ item.date_display }}</span>
+          <span class="badge">{{ item.app }}</span>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Table view -->
+  <div class="table-wrap hidden" id="list-view">
+    <table>
+      <thead>
+        <tr>
+          <th>Preview</th>
+          <th>Filename</th>
+          <th>Date / Time</th>
+          <th>App</th>
+          <th>Size</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr data-name="{{ item.filename | lower }}"
+            data-app="{{ item.app }}"
+            data-date="{{ item.date_str }}">
+          <td>
+            <a href="{{ item.rel_path }}" target="_blank" rel="noopener">
+              <img src="{{ item.thumb_path }}" alt="{{ item.filename }}" loading="lazy" />
+            </a>
+          </td>
+          <td>
+            <a href="{{ item.rel_path }}" target="_blank" rel="noopener">
+              {{ item.filename }}
+            </a>
+          </td>
+          <td>{{ item.date_display }}</td>
+          <td><span class="badge">{{ item.app }}</span></td>
+          <td>{{ item.size_kb }} KB</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <p class="no-results hidden" id="no-results">No screenshots match your filters.</p>
+
+</main>
+
+<footer>
+  Generated by SnapSort &mdash; {{ generated_at }}
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var searchEl  = document.getElementById("search");
+  var appEl     = document.getElementById("app-filter");
+  var fromEl    = document.getElementById("date-from");
+  var toEl      = document.getElementById("date-to");
+  var clearBtn  = document.getElementById("clear-btn");
+  var gridBtn   = document.getElementById("grid-btn");
+  var listBtn   = document.getElementById("list-btn");
+  var gridView  = document.getElementById("grid-view");
+  var listView  = document.getElementById("list-view");
+  var noRes     = document.getElementById("no-results");
+  var countLbl  = document.getElementById("count-label");
+
+  var cards = Array.from(gridView.querySelectorAll(".card"));
+  var rows  = Array.from(listView.querySelectorAll("tbody tr"));
+  var total = cards.length;
+
+  function applyFilters() {
+    var q    = searchEl.value.toLowerCase().trim();
+    var app  = appEl.value;
+    var from = fromEl.value;  // "YYYY-MM-DD" or ""
+    var to   = toEl.value;
+
+    var visible = 0;
+
+    cards.forEach(function (card, i) {
+      var row  = rows[i];
+      var name = card.dataset.name || "";
+      var appD = card.dataset.app  || "";
+      var date = card.dataset.date || "";
+
+      var show =
+        (!q    || name.indexOf(q) !== -1) &&
+        (!app  || appD === app) &&
+        (!from || date >= from) &&
+        (!to   || date <= to);
+
+      card.classList.toggle("hidden", !show);
+      if (row) row.classList.toggle("hidden", !show);
+      if (show) visible++;
+    });
+
+    noRes.classList.toggle("hidden", visible > 0 || total === 0);
+
+    countLbl.textContent =
+      visible === total
+        ? total + " screenshot" + (total !== 1 ? "s" : "")
+        : visible + " of " + total + " screenshot" + (total !== 1 ? "s" : "");
+  }
+
+  function clearFilters() {
+    searchEl.value = "";
+    appEl.value    = "";
+    fromEl.value   = "";
+    toEl.value     = "";
+    applyFilters();
+  }
+
+  searchEl.addEventListener("input",  applyFilters);
+  appEl   .addEventListener("change", applyFilters);
+  fromEl  .addEventListener("change", applyFilters);
+  toEl    .addEventListener("change", applyFilters);
+  clearBtn.addEventListener("click",  clearFilters);
+
+  gridBtn.addEventListener("click", function () {
+    gridView.classList.remove("hidden");
+    listView.classList.add("hidden");
+    gridBtn.classList.add("active");
+    listBtn.classList.remove("active");
+  });
+
+  listBtn.addEventListener("click", function () {
+    listView.classList.remove("hidden");
+    gridView.classList.add("hidden");
+    listBtn.classList.add("active");
+    gridBtn.classList.remove("active");
+  });
+}());
+</script>
+
+</body>
+</html>
