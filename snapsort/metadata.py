@@ -14,6 +14,7 @@ _EXIF_SOFTWARE = 305             # Software / app name
 
 # Filename-pattern -> friendly app name (checked in order)
 _APP_PATTERNS: List[Tuple[str, str]] = [
+    (r"screenshot", "Screenshot"), 
     (r"sharex", "ShareX"),
     (r"flameshot", "Flameshot"),
     (r"greenshot", "Greenshot"),
@@ -35,6 +36,8 @@ _APP_PATTERNS: List[Tuple[str, str]] = [
 
 # Filename date patterns: (regex, number_of_groups)
 _DATE_PATTERNS: List[Tuple[str, int]] = [
+    # Mac: Screenshot 2026-05-01 at 14.25.00
+    (r"(\d{4})-(\d{2})-(\d{2}) at (\d{1,2})\.(\d{2})\.(\d{2})\s*([AP]M)", 6),
     # 2026-02-09_14-32-45 or 2026-02-09 14.32.45
     (r"(\d{4})[_\-](\d{2})[_\-](\d{2})[_\- ](\d{2})[_\-\.](\d{2})[_\-\.](\d{2})", 6),
     # 20260209_143245
@@ -44,7 +47,6 @@ _DATE_PATTERNS: List[Tuple[str, int]] = [
     # 20260209
     (r"(?<!\d)(\d{4})(\d{2})(\d{2})(?!\d)", 3),
 ]
-
 
 def extract_metadata(filepath: Path) -> Dict:
     """Return a dict with keys ``date`` (datetime) and ``app`` (str).
@@ -103,17 +105,27 @@ def _parse_exif_date(value: str) -> Optional[datetime]:
     except (ValueError, TypeError):
         return None
 
-
 def _date_from_filename(name: str) -> Optional[datetime]:
     for pattern, groups in _DATE_PATTERNS:
         m = re.search(pattern, name)
         if m:
-            g = [int(x) for x in m.groups()]
             try:
-                if groups == 6:
-                    return datetime(g[0], g[1], g[2], g[3], g[4], g[5])
+                g = m.groups()
+                if groups == 6 and len(g) == 7:  # Mac 12-hour format with AM/PM
+                    nums = [int(x) for x in g[:6]]
+                    am_pm = g[6]
+                    h = nums[3]
+                    if am_pm == 'PM' and h != 12:
+                        h += 12
+                    elif am_pm == 'AM' and h == 12:
+                        h = 0
+                    return datetime(nums[0], nums[1], nums[2], h, nums[4], nums[5])
+                elif groups == 6:
+                    nums = [int(x) for x in g]
+                    return datetime(nums[0], nums[1], nums[2], nums[3], nums[4], nums[5])
                 else:
-                    return datetime(g[0], g[1], g[2])
+                    nums = [int(x) for x in g]
+                    return datetime(nums[0], nums[1], nums[2])
             except ValueError:
                 continue
     return None

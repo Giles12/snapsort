@@ -18,6 +18,7 @@ Usage
 import argparse
 import logging
 import sys
+import platform  
 from pathlib import Path
 from typing import FrozenSet
 
@@ -28,14 +29,27 @@ import yaml
 # Config helpers
 # ---------------------------------------------------------------------------
 
+def _default_watch_folder() -> str:        
+    system = platform.system()
+    if system == "Darwin":
+        return "~/Desktop"
+    elif system == "Windows":
+        return "~/Pictures/Screenshots"
+    else:
+        return "~/Pictures"
+
 def _load_config(config_path: str) -> dict:
     p = Path(config_path)
     if not p.exists():
         print(f"[error] Config file not found: {p}", file=sys.stderr)
         sys.exit(1)
     with open(p, "r", encoding="utf-8") as fh:
-        return yaml.safe_load(fh) or {}
+        config = yaml.safe_load(fh) or {}
 
+    if not config.get("watch_folder"):
+        config["watch_folder"] = _default_watch_folder()
+
+    return config
 
 def _extensions(config: dict) -> FrozenSet[str]:
     return frozenset(

@@ -1,7 +1,8 @@
 # SnapSort Configuration
 
 # Folder to monitor for new screenshots (~ expands to home directory)
-watch_folder: "C:\\Users\\Gaming\\OneDrive\\Pictures\\Screenshots"
+watch_folder: ""
+
 
 # Where to place renamed files. Leave empty to rename in-place within watch_folder.
 output_folder: ""

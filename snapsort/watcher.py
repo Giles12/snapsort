@@ -5,7 +5,7 @@ import time
 from pathlib import Path
 from typing import FrozenSet, Optional
 
-from watchdog.events import FileCreatedEvent, FileSystemEventHandler
+from watchdog.events import FileCreatedEvent, FileMovedEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
 from .indexer import generate_index
@@ -52,16 +52,29 @@ class ScreenshotHandler(FileSystemEventHandler):
         self.date_subfolders: bool = bool(config.get("date_subfolders", False))
 
     # ------------------------------------------------------------------
-    # watchdog callback
+    # watchdog callbacks
     # ------------------------------------------------------------------
 
-    def on_created(self, event: FileCreatedEvent) -> None:  # type: ignore[override]
+    def on_created(self, event: FileCreatedEvent) -> None:
         if event.is_directory:
             return
         path = Path(event.src_path)
+        if path.name.startswith('.'):
+            return
         if path.suffix.lower() not in self.extensions:
             return
-        # Skip files that SnapSort already wrote (avoid re-processing)
+        if is_canonical(path.name) and path.parent.resolve() == self.output_folder:
+            return
+        self._process(path)
+
+    def on_moved(self, event: FileMovedEvent) -> None:
+        if event.is_directory:
+            return
+        path = Path(event.dest_path)
+        if path.name.startswith('.'):
+            return
+        if path.suffix.lower() not in self.extensions:
+            return
         if is_canonical(path.name) and path.parent.resolve() == self.output_folder:
             return
         self._process(path)
