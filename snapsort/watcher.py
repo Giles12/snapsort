@@ -1,4 +1,3 @@
-"""Real-time folder watcher using the watchdog library."""
 
 import logging
 import time

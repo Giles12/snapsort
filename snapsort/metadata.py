@@ -1,4 +1,4 @@
-"""Extract creation date and application metadata from screenshot files."""
+
 
 import re
 from datetime import datetime

@@ -1,4 +1,4 @@
-"""Generate a browsable HTML index with thumbnails for a screenshots folder."""
+
 
 import logging
 import re

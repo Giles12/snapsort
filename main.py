@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""SnapSort CLI — Automated Screenshot Organizer.
-
+"""
 Commands
 --------
   watch   Monitor a folder in real time and auto-rename new screenshots.
@@ -139,7 +138,7 @@ def cmd_index(args: argparse.Namespace) -> None:
     generate_index(folder, _extensions(config), thumb_size, index_filename)
     print(f"Index written to: {folder / index_filename}")
 
-
+#NEW sTUFF
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
