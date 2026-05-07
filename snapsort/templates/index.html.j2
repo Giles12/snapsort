@@ -37,7 +37,7 @@
       min-height: 100vh;
     }
 
-    /* ── Header ─────────────────────────────────────────────────────────── */
+    /* Header  */
     header {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
@@ -60,7 +60,6 @@
     h1 span { color: var(--accent2); }
     #count-label { color: var(--muted); font-size: 0.82rem; margin-left: auto; }
 
-    /* ── Filter bar ──────────────────────────────────────────────────────── */
     .filters {
       display: flex;
       flex-wrap: wrap;
@@ -96,7 +95,7 @@
     .view-toggle { display: flex; gap: 0.3rem; margin-left: auto; }
     .view-btn { font-size: 1rem; padding: 0.3rem 0.55rem; }
 
-    /* ── Main content ────────────────────────────────────────────────────── */
+    /* main content */
     main { padding: 1.25rem 1.75rem 2rem; }
 
     /* Grid view */
@@ -263,7 +262,7 @@
 
 <main>
 
-  <!-- Grid view -->
+  
   <div class="gallery" id="grid-view">
     {% for item in items %}
     <div class="card"
@@ -284,7 +283,7 @@
     {% endfor %}
   </div>
 
-  <!-- Table view -->
+
   <div class="table-wrap hidden" id="list-view">
     <table>
       <thead>

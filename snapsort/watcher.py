@@ -1,4 +1,4 @@
-"""Real-time folder watcher using the watchdog library."""
+
 
 import logging
 import time
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 _DEFAULT_EXTENSIONS: FrozenSet[str] = frozenset(
     {".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp", ".tiff", ".tif"}
 )
-# Seconds to wait for a file write to stabilise before processing
+# seconds to wait for a file write before processing
 _SETTLE_SECONDS = 1.5
 _SETTLE_TIMEOUT = 15.0
 
@@ -51,9 +51,7 @@ class ScreenshotHandler(FileSystemEventHandler):
         self.index_filename: str = config.get("index_filename", "index.html")
         self.date_subfolders: bool = bool(config.get("date_subfolders", False))
 
-    # ------------------------------------------------------------------
     # watchdog callbacks
-    # ------------------------------------------------------------------
 
     def on_created(self, event: FileCreatedEvent) -> None:
         if event.is_directory:
@@ -79,9 +77,7 @@ class ScreenshotHandler(FileSystemEventHandler):
             return
         self._process(path)
 
-    # ------------------------------------------------------------------
-    # Internal helpers
-    # ------------------------------------------------------------------
+    # internal helpers
 
     def _process(self, src: Path) -> None:
         self._wait_for_stable(src)
@@ -133,9 +129,7 @@ class ScreenshotHandler(FileSystemEventHandler):
             logger.error("Index rebuild failed: %s", exc)
 
 
-# ---------------------------------------------------------------------------
-# Public entry point
-# ---------------------------------------------------------------------------
+# watching point
 
 def start_watching(config: dict) -> None:
     """Block and watch *config['watch_folder']* until Ctrl-C."""

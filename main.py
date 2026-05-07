@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SnapSort CLI — Automated Screenshot Organizer.
+"""SnapSort CLI 
 
 Commands
 --------
@@ -24,10 +24,7 @@ from typing import FrozenSet
 
 import yaml
 
-
-# ---------------------------------------------------------------------------
 # Config helpers
-# ---------------------------------------------------------------------------
 
 def _default_watch_folder() -> str:        
     system = platform.system()
@@ -60,9 +57,7 @@ def _extensions(config: dict) -> FrozenSet[str]:
     )
 
 
-# ---------------------------------------------------------------------------
-# Sub-commands
-# ---------------------------------------------------------------------------
+# sub commands
 
 def cmd_watch(args: argparse.Namespace) -> None:
     from snapsort.watcher import start_watching
@@ -124,7 +119,7 @@ def cmd_rename(args: argparse.Namespace) -> None:
         f"  (total: {len(files)})"
     )
 
-
+# Function to generate an HTML index for a folder of screenshots
 def cmd_index(args: argparse.Namespace) -> None:
     from snapsort.indexer import generate_index
 
@@ -140,9 +135,7 @@ def cmd_index(args: argparse.Namespace) -> None:
     print(f"Index written to: {folder / index_filename}")
 
 
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(

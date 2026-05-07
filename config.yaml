@@ -29,5 +29,5 @@ image_extensions:
   - ".webp"
   - ".tiff"
 
-# Organise files into YYYY/MM-DD subfolders within output_folder
+# Organize files into YYYY/MM-DD subfolders within output folder
 date_subfolders: false

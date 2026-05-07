@@ -8,19 +8,18 @@ SnapSort monitors a screenshots folder, extracts creation-date and application m
 
 ## Features
 
-| Feature | Status |
-|---|---|
-| Real-time folder watching | ✅ |
-| EXIF metadata extraction (date, software) | ✅ |
-| Filename-pattern date/app fallback | ✅ |
-| Canonical rename: `YYYY-MM-DD_APP_HH-MM-SS.ext` | ✅ |
-| Collision-safe rename (sequence suffix) | ✅ |
-| Backup originals before rename | ✅ |
-| Thumbnail generation | ✅ |
-| HTML index with grid + table views | ✅ |
-| Search / filter by name, app, date range (JS) | ✅ |
-| Date-based subfolders (optional) | ✅ |
-| Cross-platform (Windows / macOS / Linux) | ✅ |
+
+| Real-time folder watching 
+| EXIF metadata extraction (date, software) 
+| Filename-pattern date/app fallback 
+| Canonical rename: `YYYY-MM-DD_APP_HH-MM-SS.ext` 
+| Collision-safe rename (sequence suffix) 
+| Backup originals before rename 
+| Thumbnail generation 
+| HTML index with grid + table views 
+| Search / filter by name, app, date range (JS) 
+| Date-based subfolders (optional)
+| Cross-platform (Windows / macOS / Linux) 
 
 ---
 
@@ -130,10 +129,10 @@ snapsort/
 
 ---
 
-## Deliverables (per project spec)
+## Deliverables
 
-- Git repository with full source
+- Source Code
 - CLI executable (`main.py`)
-- `config.yaml` (setup & demo ready)
+- `config.yaml` 
 - Sample watch folder: point `watch_folder` at any directory containing screenshots
-- Final report (see paper)
+- Final report

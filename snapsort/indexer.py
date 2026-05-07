@@ -1,4 +1,3 @@
-"""Generate a browsable HTML index with thumbnails for a screenshots folder."""
 
 import logging
 import re
@@ -30,7 +29,6 @@ def generate_index(
     thumb_size: Tuple[int, int],
     index_filename: str = "index.html",
 ) -> None:
-    """Scan *folder*, regenerate thumbnails, and write the HTML index."""
     folder = Path(folder).resolve()
     thumbs_dir = folder / _THUMBS_SUBDIR
     thumbs_dir.mkdir(parents=True, exist_ok=True)
@@ -63,7 +61,7 @@ def generate_index(
             }
         )
 
-    # Most-recent first
+    # most-recent first
     items.sort(key=lambda x: x["date_str"], reverse=True)
     apps = sorted({i["app"] for i in items if i["app"] != "Unknown"})
 
@@ -84,9 +82,7 @@ def generate_index(
     logger.info("Index updated: %s  (%d files)", index_path, len(items))
 
 
-# ---------------------------------------------------------------------------
-# Internal helpers
-# ---------------------------------------------------------------------------
+# internal helpers
 
 def _ensure_thumb(img_path: Path, thumbs_dir: Path, size: Tuple[int, int]) -> str:
     """Create thumbnail if missing; return thumb filename."""
@@ -114,7 +110,7 @@ def _date_from_name(name: str) -> Optional[datetime]:
             return datetime(g[0], g[1], g[2], g[3], g[4], g[5])
         except ValueError:
             pass
-    # Broader fallback patterns
+    #  fallback patterns
     for pattern in [
         r"(\d{4})[_\-](\d{2})[_\-](\d{2})[_\- ](\d{2})[_\-\.](\d{2})[_\-\.](\d{2})",
         r"(\d{4})[_\-](\d{2})[_\-](\d{2})",

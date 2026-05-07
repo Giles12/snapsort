@@ -1,4 +1,4 @@
-"""Rename screenshot files to the standardized YYYY-MM-DD_APP_HH-MM-SS format."""
+#Renames screenshot files to the standardized YYYY-MM-DD_APP_HH-MM-SS format
 
 import re
 import shutil
@@ -6,22 +6,19 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-# Files already in our canonical format — skip re-processing
+# Files already in our format — skip 
 _CANONICAL_RE = re.compile(
     r"^\d{4}-\d{2}-\d{2}_[\w]+_\d{2}-\d{2}-\d{2}(_\d+)?\.\w+$"
 )
 
 
 def is_canonical(filename: str) -> bool:
-    """Return True if *filename* already matches the SnapSort naming pattern."""
+    #Return True if filename already matches the SnapSort naming pattern
     return bool(_CANONICAL_RE.match(filename))
 
 
 def build_name(date: datetime, app: str, ext: str, collision_index: int = 0) -> str:
-    """Build the canonical filename string.
-
-    ``collision_index`` > 0 appends a two-digit suffix to avoid clashes.
-    """
+    
     timestamp = date.strftime("%Y-%m-%d_%H-%M-%S")
     base = f"{timestamp}_{app}"
     if collision_index > 0:
@@ -37,9 +34,6 @@ def rename_file(
     backup_dir: Optional[Path] = None,
 ) -> Path:
     """Rename *src* into *dest_dir* using the canonical SnapSort name.
-
-    Parameters
-    ----------
     src:
         Original file path.
     dest_dir:
@@ -52,8 +46,6 @@ def rename_file(
         If given, a copy of the original is saved here before renaming.
 
     Returns
-    -------
-    Path
         Path to the renamed file (or *src* unchanged if already canonical).
     """
     if is_canonical(src.name) and src.parent.resolve() == dest_dir.resolve():
@@ -61,7 +53,7 @@ def rename_file(
 
     dest_dir.mkdir(parents=True, exist_ok=True)
 
-    # Build a collision-free destination path
+    # Build a collision free destination path
     ext = src.suffix
     candidate = build_name(date, app, ext)
     dest = dest_dir / candidate
@@ -72,7 +64,8 @@ def rename_file(
         idx += 1
 
     if dest.resolve() == src.resolve():
-        return src  # Destination is the same file (e.g., already named correctly)
+        return src  
+    # Destination is the same file 
 
     # Backup original before moving
     if backup_dir is not None:

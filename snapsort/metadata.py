@@ -1,4 +1,3 @@
-"""Extract creation date and application metadata from screenshot files."""
 
 import re
 from datetime import datetime
@@ -12,7 +11,7 @@ _EXIF_DATETIME_ORIGINAL = 36867  # DateTimeOriginal (preferred)
 _EXIF_DATETIME = 306             # DateTime (fallback)
 _EXIF_SOFTWARE = 305             # Software / app name
 
-# Filename-pattern -> friendly app name (checked in order)
+# Filename-pattern 
 _APP_PATTERNS: List[Tuple[str, str]] = [
     (r"screenshot", "Screenshot"), 
     (r"sharex", "ShareX"),
@@ -62,7 +61,7 @@ def extract_metadata(filepath: Path) -> Dict:
         "original_path": filepath,
     }
 
-    # --- EXIF -----------------------------------------------------------------
+    # EXIF metadata 
     try:
         with Image.open(filepath) as img:
             exif = img._getexif()  # returns None for non-JPEG or missing EXIF
@@ -75,17 +74,17 @@ def extract_metadata(filepath: Path) -> Dict:
                 if raw_sw:
                     meta["app"] = _sanitize_app_name(raw_sw)
     except Exception:
-        pass  # non-image or corrupt file; fall through to filename heuristics
+        pass  # non image or corrupt file will be passed
 
-    # --- Filename date --------------------------------------------------------
+    # Filename date
     if meta["date"] is None:
         meta["date"] = _date_from_filename(filepath.name)
 
-    # --- mtime fallback -------------------------------------------------------
+    # mtime fallback
     if meta["date"] is None:
         meta["date"] = datetime.fromtimestamp(filepath.stat().st_mtime)
 
-    # --- Filename app detection -----------------------------------------------
+    # Filename app detection
     if not meta["app"]:
         meta["app"] = _app_from_filename(filepath.name)
 
@@ -95,9 +94,8 @@ def extract_metadata(filepath: Path) -> Dict:
     return meta
 
 
-# ---------------------------------------------------------------------------
 # Internal helpers
-# ---------------------------------------------------------------------------
+
 
 def _parse_exif_date(value: str) -> Optional[datetime]:
     try:
@@ -132,10 +130,9 @@ def _date_from_filename(name: str) -> Optional[datetime]:
 
 
 def _sanitize_app_name(name: str) -> str:
-    """Strip version numbers and non-filename-safe characters from an app name."""
-    # Drop trailing version strings like " 120.0.6099.129"
+    # Drop strings like " 120.0.6099.129"
     name = re.sub(r"\s+\d[\d.]+.*$", "", name)
-    # Keep only word characters (letters, digits, underscore)
+    # Keep only word characters 
     name = re.sub(r"[^\w]", "", name)
     name = name.strip("_")
     return name[:24] if name else ""
