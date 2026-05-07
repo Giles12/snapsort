@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""SnapSort CLI 
-
-Commands
+"""Commands
 --------
   watch   Monitor a folder in real time and auto-rename new screenshots.
   rename  Batch-rename all existing screenshots in a folder.

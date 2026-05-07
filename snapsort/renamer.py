@@ -1,4 +1,4 @@
-#Renames screenshot files to the standardized YYYY-MM-DD_APP_HH-MM-SS format
+
 
 import re
 import shutil
