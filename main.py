@@ -1,18 +1,3 @@
-#!/usr/bin/env python3
-"""Commands
---------
-  watch   Monitor a folder in real time and auto-rename new screenshots.
-  rename  Batch-rename all existing screenshots in a folder.
-  index   Generate (or regenerate) the HTML browsing index.
-
-Usage
------
-  python main.py watch
-  python main.py rename ~/Screenshots
-  python main.py index  ~/Screenshots
-  python main.py -c /path/to/custom.yaml watch
-"""
-
 import argparse
 import logging
 import sys
@@ -22,7 +7,7 @@ from typing import FrozenSet
 
 import yaml
 
-# Config helpers
+
 
 def _default_watch_folder() -> str:        
     system = platform.system()
@@ -55,7 +40,6 @@ def _extensions(config: dict) -> FrozenSet[str]:
     )
 
 
-# sub commands
 
 def cmd_watch(args: argparse.Namespace) -> None:
     from snapsort.watcher import start_watching
@@ -117,7 +101,7 @@ def cmd_rename(args: argparse.Namespace) -> None:
         f"  (total: {len(files)})"
     )
 
-# Function to generate an HTML index for a folder of screenshots
+
 def cmd_index(args: argparse.Namespace) -> None:
     from snapsort.indexer import generate_index
 
@@ -131,8 +115,6 @@ def cmd_index(args: argparse.Namespace) -> None:
     index_filename = config.get("index_filename", "index.html")
     generate_index(folder, _extensions(config), thumb_size, index_filename)
     print(f"Index written to: {folder / index_filename}")
-
-
 
 
 def main() -> None:
@@ -152,17 +134,14 @@ def main() -> None:
     sub = parser.add_subparsers(dest="command", metavar="COMMAND")
     sub.required = True
 
-    # watch
     p_watch = sub.add_parser("watch", help="Monitor folder for new screenshots in real time")
     p_watch.add_argument("folder", nargs="?", help="Folder to watch (overrides config)")
     p_watch.set_defaults(func=cmd_watch)
 
-    # rename
     p_rename = sub.add_parser("rename", help="Batch-rename existing screenshots")
     p_rename.add_argument("folder", nargs="?", help="Folder to process (overrides config)")
     p_rename.set_defaults(func=cmd_rename)
 
-    # index
     p_index = sub.add_parser("index", help="Generate HTML browsing index")
     p_index.add_argument("folder", nargs="?", help="Folder to index (overrides config)")
     p_index.set_defaults(func=cmd_index)

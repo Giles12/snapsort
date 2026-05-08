@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 _TEMPLATES_DIR = Path(__file__).parent / "templates"
 _THUMBS_SUBDIR = ".thumbs"
 
-# Regex to extract app name from canonical SnapSort filename
+
 _CANONICAL_APP_RE = re.compile(
     r"^\d{4}-\d{2}-\d{2}_(.+?)_\d{2}-\d{2}-\d{2}"
 )
@@ -42,7 +42,6 @@ def generate_index(
             continue
         if img_path.name == index_filename:
             continue
-        # Skip the backup folder or thumbs folder
         if img_path.parent.name in (_THUMBS_SUBDIR, ".backup"):
             continue
 
@@ -62,7 +61,6 @@ def generate_index(
             }
         )
 
-    # most-recent first
     items.sort(key=lambda x: x["date_str"], reverse=True)
     apps = sorted({i["app"] for i in items if i["app"] != "Unknown"})
 
@@ -83,10 +81,8 @@ def generate_index(
     logger.info("Index updated: %s  (%d files)", index_path, len(items))
 
 
-# internal helpers
 
 def _ensure_thumb(img_path: Path, thumbs_dir: Path, size: Tuple[int, int]) -> str:
-    """Create thumbnail if missing; return thumb filename."""
     thumb_name = f"{img_path.stem}_thumb{img_path.suffix}"
     thumb_path = thumbs_dir / thumb_name
     if not thumb_path.exists():
@@ -111,7 +107,6 @@ def _date_from_name(name: str) -> Optional[datetime]:
             return datetime(g[0], g[1], g[2], g[3], g[4], g[5])
         except ValueError:
             pass
-    #  fallback patterns
     for pattern in [
         r"(\d{4})[_\-](\d{2})[_\-](\d{2})[_\- ](\d{2})[_\-\.](\d{2})[_\-\.](\d{2})",
         r"(\d{4})[_\-](\d{2})[_\-](\d{2})",

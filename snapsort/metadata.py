@@ -7,12 +7,10 @@ from typing import Dict, List, Optional, Tuple
 
 from PIL import Image
 
-# EXIF tag IDs
-_EXIF_DATETIME_ORIGINAL = 36867  # DateTimeOriginal (preferred)
-_EXIF_DATETIME = 306             # DateTime (fallback)
-_EXIF_SOFTWARE = 305             # Software / app name
+_EXIF_DATETIME_ORIGINAL = 36867
+_EXIF_DATETIME = 306
+_EXIF_SOFTWARE = 305
 
-# Filename-pattern 
 _APP_PATTERNS: List[Tuple[str, str]] = [
     (r"screenshot", "Screenshot"), 
     (r"sharex", "ShareX"),
@@ -34,35 +32,21 @@ _APP_PATTERNS: List[Tuple[str, str]] = [
     (r"obs", "OBS"),
 ]
 
-# Filename date patterns: (regex, number_of_groups)
 _DATE_PATTERNS: List[Tuple[str, int]] = [
-    # Mac: Screenshot 2026-05-01 at 14.25.00
     (r"(\d{4})-(\d{2})-(\d{2}) at (\d{1,2})\.(\d{2})\.(\d{2})\s*([AP]M)", 6),
-    # 2026-02-09_14-32-45 or 2026-02-09 14.32.45
     (r"(\d{4})[_\-](\d{2})[_\-](\d{2})[_\- ](\d{2})[_\-\.](\d{2})[_\-\.](\d{2})", 6),
-    # 20260209_143245
     (r"(\d{4})(\d{2})(\d{2})[_\-](\d{2})(\d{2})(\d{2})", 6),
-    # 2026-02-09
     (r"(\d{4})[_\-](\d{2})[_\-](\d{2})", 3),
-    # 20260209
     (r"(?<!\d)(\d{4})(\d{2})(\d{2})(?!\d)", 3),
 ]
 
 def extract_metadata(filepath: Path) -> Dict:
-    """Return a dict with keys ``date`` (datetime) and ``app`` (str).
-
-    Extraction order:
-    1. EXIF tags (DateTimeOriginal, Software)
-    2. Filename pattern matching
-    3. File modification time / 'Screenshot' fallback
-    """
     meta: Dict = {
         "date": None,
         "app": None,
         "original_path": filepath,
     }
 
-    # EXIF metadata 
     try:
         with Image.open(filepath) as img:
             exif = img._getexif()  # returns None for non-JPEG or missing EXIF
@@ -75,17 +59,14 @@ def extract_metadata(filepath: Path) -> Dict:
                 if raw_sw:
                     meta["app"] = _sanitize_app_name(raw_sw)
     except Exception:
-        pass  # non image or corrupt file will be passed
+        pass
 
-    # Filename date
     if meta["date"] is None:
         meta["date"] = _date_from_filename(filepath.name)
 
-    # mtime fallback
     if meta["date"] is None:
         meta["date"] = datetime.fromtimestamp(filepath.stat().st_mtime)
 
-    # Filename app detection
     if not meta["app"]:
         meta["app"] = _app_from_filename(filepath.name)
 
@@ -93,9 +74,6 @@ def extract_metadata(filepath: Path) -> Dict:
         meta["app"] = "Screenshot"
 
     return meta
-
-
-# Internal helpers
 
 
 def _parse_exif_date(value: str) -> Optional[datetime]:
@@ -131,9 +109,7 @@ def _date_from_filename(name: str) -> Optional[datetime]:
 
 
 def _sanitize_app_name(name: str) -> str:
-    # Drop strings like " 120.0.6099.129"
     name = re.sub(r"\s+\d[\d.]+.*$", "", name)
-    # Keep only word characters 
     name = re.sub(r"[^\w]", "", name)
     name = name.strip("_")
     return name[:24] if name else ""

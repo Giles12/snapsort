@@ -16,14 +16,11 @@ logger = logging.getLogger(__name__)
 _DEFAULT_EXTENSIONS: FrozenSet[str] = frozenset(
     {".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp", ".tiff", ".tif"}
 )
-# seconds to wait for a file write before processing
 _SETTLE_SECONDS = 1.5
 _SETTLE_TIMEOUT = 15.0
 
 
 class ScreenshotHandler(FileSystemEventHandler):
-    """Handles new-file events in the watched folder."""
-
     def __init__(self, config: dict) -> None:
         super().__init__()
         self.watch_folder = Path(config["watch_folder"]).expanduser().resolve()
@@ -50,8 +47,6 @@ class ScreenshotHandler(FileSystemEventHandler):
         self.index_filename: str = config.get("index_filename", "index.html")
         self.date_subfolders: bool = bool(config.get("date_subfolders", False))
 
-    # watchdog callbacks
-
     def on_created(self, event: FileCreatedEvent) -> None:
         if event.is_directory:
             return
@@ -76,12 +71,10 @@ class ScreenshotHandler(FileSystemEventHandler):
             return
         self._process(path)
 
-    # internal helpers
-
     def _process(self, src: Path) -> None:
         self._wait_for_stable(src)
         if not src.exists():
-            return  # deleted before we could process it
+            return
 
         try:
             meta = extract_metadata(src)
@@ -100,7 +93,6 @@ class ScreenshotHandler(FileSystemEventHandler):
             logger.error("Failed to process %s: %s", src, exc)
 
     def _wait_for_stable(self, path: Path) -> None:
-        """Poll file size until it stops changing (file fully written)."""
         prev_size = -1
         elapsed = 0.0
         while elapsed < _SETTLE_TIMEOUT:
@@ -128,10 +120,8 @@ class ScreenshotHandler(FileSystemEventHandler):
             logger.error("Index rebuild failed: %s", exc)
 
 
-# watching point
 
 def start_watching(config: dict) -> None:
-    """Block and watch *config['watch_folder']* until Ctrl-C."""
     handler = ScreenshotHandler(config)
     observer = Observer()
     observer.schedule(handler, str(handler.watch_folder), recursive=False)
